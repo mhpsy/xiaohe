@@ -1,0 +1,23 @@
+[package]
+name = "xiaohe"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+description = "CLI for querying the Xiaohe Shuangpin (小鹤双拼) scheme"
+license = "MIT"
+repository = "https://github.com/mhpsy/xiaohe"
+readme = "README.md"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+anstream = "0.6"
+anstyle = "1"
+strsim = "0.11"
+
+[lib]
+name = "xiaohe"
+path = "src/lib.rs"
+
+[[bin]]
+name = "xiaohe"
+path = "src/main.rs"
