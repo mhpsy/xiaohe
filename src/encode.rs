@@ -1,4 +1,4 @@
-use crate::tables::{lookup_final, lookup_initial, ZERO_INITIAL_FINALS};
+use crate::tables::{lookup_final, lookup_initial, SYLLABLES, ZERO_INITIAL_FINALS};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum EncodeError {
@@ -10,9 +10,16 @@ pub enum EncodeError {
 }
 
 pub fn encode_syllable(input: &str) -> Result<[char; 2], EncodeError> {
-    let normalized = input.trim().to_ascii_lowercase();
+    let normalized = input.trim().to_ascii_lowercase().replace('\u{00fc}', "v");
     if normalized.is_empty() {
         return Err(EncodeError::Empty);
+    }
+
+    if !SYLLABLES.contains(&normalized.as_str()) {
+        return Err(EncodeError::InvalidSyllable {
+            input: normalized.clone(),
+            suggestions: crate::suggest::nearest(&normalized, 3),
+        });
     }
 
     // Zero-initial: the syllable IS its own final.
@@ -22,7 +29,7 @@ pub fn encode_syllable(input: &str) -> Result<[char; 2], EncodeError> {
         return Ok([initial_key, final_key]);
     }
 
-    // 1) Two-letter initial first (zh/ch/sh).
+    // Two-letter initial first (zh/ch/sh).
     if normalized.len() >= 3 {
         let head = &normalized[..2];
         if let Some(initial_key) = lookup_initial(head) {
@@ -33,19 +40,12 @@ pub fn encode_syllable(input: &str) -> Result<[char; 2], EncodeError> {
         }
     }
 
-    // 2) Single-letter initial + final.
-    if normalized.len() >= 2 {
-        let head = normalized.as_bytes()[0] as char;
-        let tail = &normalized[1..];
-        if let Some(final_key) = lookup_final(tail) {
-            return Ok([head, final_key]);
-        }
-    }
-
-    Err(EncodeError::InvalidSyllable {
-        input: normalized.clone(),
-        suggestions: crate::suggest::nearest(&normalized, 3),
-    })
+    // Single-letter initial + final.
+    let head = normalized.as_bytes()[0] as char;
+    let tail = &normalized[1..];
+    let final_key = lookup_final(tail)
+        .expect("SYLLABLES entry must split into known initial + final");
+    Ok([head, final_key])
 }
 
 #[cfg(test)]
@@ -93,6 +93,31 @@ mod tests {
             Err(EncodeError::InvalidSyllable { input, .. }) => assert_eq!(input, "zzz"),
             other => panic!("unexpected: {other:?}"),
         }
+    }
+
+    #[test]
+    fn accepts_literal_u_umlaut_character() {
+        assert_eq!(encode_syllable("n\u{00fc}"), Ok(['n', 'v']));
+        assert_eq!(encode_syllable("l\u{00fc}e"), Ok(['l', 't']));
+    }
+
+    #[test]
+    fn rejects_non_syllable_that_splits_cleanly() {
+        // 'biang' splits as b+iang -> 'bl', but 'biang' is not a legal pinyin syllable.
+        assert!(matches!(
+            encode_syllable("biang"),
+            Err(EncodeError::InvalidSyllable { .. })
+        ));
+        // 'juo' splits as j+uo -> 'jo', but 'juo' is not a legal syllable.
+        assert!(matches!(
+            encode_syllable("juo"),
+            Err(EncodeError::InvalidSyllable { .. })
+        ));
+    }
+
+    #[test]
+    fn xian_does_not_split_as_xi_plus_an() {
+        assert_eq!(encode_syllable("xian"), Ok(['x', 'm']));
     }
 
     #[test]
