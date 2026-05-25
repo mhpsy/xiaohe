@@ -75,7 +75,7 @@ The plan hard-codes the official scheme below. Before encoding tables in Rust (T
 name = "xiaohe"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.83"
+rust-version = "1.85"
 description = "CLI for querying the Xiaohe Shuangpin (小鹤双拼) scheme"
 license = "MIT"
 repository = "https://github.com/mhpsy/xiaohe"
