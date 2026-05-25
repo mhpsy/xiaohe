@@ -61,6 +61,15 @@ pub fn lookup_final(s: &str) -> Option<char> {
         .find_map(|(k, v)| if *k == s { Some(*v) } else { None })
 }
 
+/// Sorted list of all legal Mandarin pinyin syllables (ASCII, with `v` for ü).
+/// Populated fully in Task 9 from the golden TSV; the entries below are a
+/// representative subset used by unit tests in earlier tasks.
+pub static SYLLABLES: &[&str] = &[
+    "a", "ai", "an", "ang", "ao",
+    "ba", "chuang", "e", "er", "lve", "nv", "ou",
+    "shuai", "xiao", "xie", "xian", "yi", "ying", "zhong",
+];
+
 #[cfg(test)]
 mod tests {
     use super::*;
