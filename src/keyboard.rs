@@ -11,7 +11,7 @@ const ROW_1: &[char] = &['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'];
 const ROW_2: &[char] = &['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'];
 const ROW_3: &[char] = &['z', 'x', 'c', 'v', 'b', 'n', 'm'];
 
-const CELL_WIDTH: usize = 5;
+const CELL_WIDTH: usize = 9;
 const INITIAL_STYLE: Ansi = Ansi::new().fg_color(Some(anstyle::Color::Ansi(AnsiColor::Blue)));
 const FINAL_STYLE: Ansi = Ansi::new().fg_color(Some(anstyle::Color::Ansi(AnsiColor::Green)));
 const DIM_STYLE: Ansi = Ansi::new().fg_color(Some(anstyle::Color::Ansi(AnsiColor::BrightBlack)));
