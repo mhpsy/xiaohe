@@ -187,7 +187,7 @@ Explicitly **not** included: `serde`, `serde_json`, `tokio`, `colored`, `insta`.
 
 ## 9. Project setup
 
-- Rust edition 2024, `rust-version = "1.83"`.
+- Rust edition 2024, `rust-version = "1.85"` (edition 2024 requires ≥ 1.85).
 - `cargo init` produces the binary; the library is added by introducing `src/lib.rs`.
 - `LICENSE`: MIT.
 - `.gitignore`: `/target`.

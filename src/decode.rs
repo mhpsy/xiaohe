@@ -1,15 +1,20 @@
 use crate::encode::encode_syllable;
 use crate::tables::SYLLABLES;
 
+/// Errors that can arise when decoding a Shuangpin code back to pinyin.
 #[derive(Debug, PartialEq, Eq)]
 pub enum DecodeError {
-    InvalidLength { input: String },
+    /// The input was not exactly two ASCII lowercase letters.
+    InvalidFormat { input: String },
 }
 
+/// Decode a 2-letter Shuangpin code into every legal pinyin syllable that
+/// produces that code under [`encode_syllable`]. The returned vector is
+/// sorted lexicographically and may be empty.
 pub fn decode_code(code: &str) -> Result<Vec<&'static str>, DecodeError> {
     let normalized = code.trim().to_ascii_lowercase();
     if normalized.chars().count() != 2 || !normalized.chars().all(|c| c.is_ascii_lowercase()) {
-        return Err(DecodeError::InvalidLength { input: normalized });
+        return Err(DecodeError::InvalidFormat { input: normalized });
     }
     let target: [char; 2] = {
         let mut it = normalized.chars();
@@ -36,9 +41,9 @@ mod tests {
     }
 
     #[test]
-    fn rejects_non_two_char_input() {
-        assert!(matches!(decode_code("x"), Err(DecodeError::InvalidLength { .. })));
-        assert!(matches!(decode_code("xyz"), Err(DecodeError::InvalidLength { .. })));
-        assert!(matches!(decode_code("x1"), Err(DecodeError::InvalidLength { .. })));
+    fn rejects_malformed_input() {
+        assert!(matches!(decode_code("x"), Err(DecodeError::InvalidFormat { .. })));
+        assert!(matches!(decode_code("xyz"), Err(DecodeError::InvalidFormat { .. })));
+        assert!(matches!(decode_code("x1"), Err(DecodeError::InvalidFormat { .. })));
     }
 }

@@ -1,14 +1,24 @@
 use crate::tables::{lookup_final, lookup_initial, SYLLABLES, ZERO_INITIAL_FINALS};
 
+/// Errors that can arise when encoding a pinyin syllable to its Shuangpin code.
 #[derive(Debug, PartialEq, Eq)]
 pub enum EncodeError {
+    /// Input was empty or whitespace-only.
     Empty,
+    /// Input was not a legal Mandarin pinyin syllable. `suggestions` lists up
+    /// to three closest legal syllables (Damerau-Levenshtein distance ≤ 2).
     InvalidSyllable {
         input: String,
         suggestions: Vec<&'static str>,
     },
 }
 
+/// Encode a single pinyin syllable to its 2-character Xiaohe Shuangpin code.
+///
+/// Input is normalized by trimming, ASCII-lowercasing, and substituting any
+/// literal `ü` (U+00FC) with `v` per the Xiaohe convention. Returns
+/// [`EncodeError::Empty`] for blank input and [`EncodeError::InvalidSyllable`]
+/// if the normalized form is not in [`crate::SYLLABLES`].
 pub fn encode_syllable(input: &str) -> Result<[char; 2], EncodeError> {
     let normalized = input.trim().to_ascii_lowercase().replace('\u{00fc}', "v");
     if normalized.is_empty() {

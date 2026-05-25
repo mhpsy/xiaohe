@@ -1,9 +1,13 @@
 use anstyle::{AnsiColor, Reset, Style as Ansi};
 use crate::tables::{FINAL_MAP, MULTI_LETTER_INITIALS};
 
+/// Whether [`render_keyboard`] should emit ANSI color escapes or plain ASCII.
 #[derive(Copy, Clone, Debug)]
 pub enum Style {
+    /// Wrap each cell in ANSI color codes (initials blue, finals green,
+    /// empty cells dim).
     Color,
+    /// Emit ASCII only — safe for files, pipes, and `cat`-style processing.
     Plain,
 }
 
@@ -99,6 +103,9 @@ fn colorize(padded: &str, raw: &str, color: Ansi, style: Style) -> String {
     }
 }
 
+/// Render the Xiaohe Shuangpin keyboard layout as a multi-line string with a
+/// QWERTY-shaped grid. Each cell shows three lines: key letter, pinyin
+/// initial assigned to that key, and pinyin final(s) assigned to that key.
 pub fn render_keyboard(style: Style) -> String {
     let mut out = String::new();
     out.push_str(&render_row(ROW_1, 0, style));

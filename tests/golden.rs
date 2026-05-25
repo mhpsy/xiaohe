@@ -1,7 +1,6 @@
 use std::fs;
 
-use xiaohe::decode::decode_code;
-use xiaohe::encode::encode_syllable;
+use xiaohe::{decode_code, encode_syllable, render_keyboard, Style, SYLLABLES};
 
 #[test]
 fn golden_tsv_matches_encode_and_decode() {
@@ -38,4 +37,24 @@ fn golden_tsv_matches_encode_and_decode() {
         count += 1;
     }
     assert!(count >= 400, "expected ~410 syllables, got {count}");
+}
+
+#[test]
+fn table_plain_matches_snapshot() {
+    let actual = render_keyboard(Style::Plain);
+    let expected = include_str!("fixtures/table.snapshot");
+    assert_eq!(actual, expected, "tests/fixtures/table.snapshot is stale; \
+        regenerate with `cargo run -q -- table > tests/fixtures/table.snapshot`");
+}
+
+#[test]
+fn list_plain_matches_snapshot() {
+    let mut actual = String::new();
+    for s in SYLLABLES {
+        let code = encode_syllable(s).expect("SYLLABLES entry must encode");
+        actual.push_str(&format!("{s}\t{}{}\n", code[0], code[1]));
+    }
+    let expected = include_str!("fixtures/list.snapshot");
+    assert_eq!(actual, expected, "tests/fixtures/list.snapshot is stale; \
+        regenerate with `cargo run -q -- list > tests/fixtures/list.snapshot`");
 }
