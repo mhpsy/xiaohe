@@ -43,8 +43,8 @@ pub fn encode_syllable(input: &str) -> Result<[char; 2], EncodeError> {
     }
 
     Err(EncodeError::InvalidSyllable {
-        input: normalized,
-        suggestions: Vec::new(),
+        input: normalized.clone(),
+        suggestions: crate::suggest::nearest(&normalized, 3),
     })
 }
 
@@ -91,6 +91,22 @@ mod tests {
     fn returns_invalid_syllable_for_garbage() {
         match encode_syllable("zzz") {
             Err(EncodeError::InvalidSyllable { input, .. }) => assert_eq!(input, "zzz"),
+            other => panic!("unexpected: {other:?}"),
+        }
+    }
+
+    #[test]
+    fn invalid_syllable_includes_suggestions() {
+        let err = encode_syllable("xio").unwrap_err();
+        match err {
+            EncodeError::InvalidSyllable { input, suggestions } => {
+                assert_eq!(input, "xio");
+                assert!(
+                    suggestions.contains(&"xiao"),
+                    "expected xiao in suggestions: {suggestions:?}"
+                );
+                assert!(suggestions.len() <= 3);
+            }
             other => panic!("unexpected: {other:?}"),
         }
     }
