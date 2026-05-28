@@ -1,1 +1,8 @@
 /target
+
+# makepkg build artifacts under packaging/aur/<pkg>/
+packaging/aur/*/pkg/
+packaging/aur/*/src/
+packaging/aur/*/*.pkg.tar.zst
+packaging/aur/*/*.tar.gz
+packaging/aur/*/LICENSE-*
