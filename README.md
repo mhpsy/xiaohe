@@ -28,6 +28,13 @@ xian	xm
 xiang	xl
 xiao	xn
 ...
+
+$ xiaohe interactive         # alias: i — encode one syllable per line
+xiaohe interactive — type a pinyin syllable, Ctrl-D or 'quit' to exit
+hao
+hc
+xian
+xm
 ```
 
 Use `v` to type `ü`: `xiaohe encode nv` → `nv` (= nü).
